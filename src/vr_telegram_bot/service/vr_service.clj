@@ -1,6 +1,8 @@
 (ns vr_telegram_bot.service.vr-service
   (:require [clj-http.client :refer [post]]
-            [cheshire.core :refer [encode parse-string]]))
+            [cheshire.core :refer [encode parse-string]]
+            [clj-time.core :as time]
+            [clj-time.format :as format]))
 
 (def url "https://backend-v3-prod.vrfi.prodvrfi.vrpublic.fi/")
 (def query
@@ -11,7 +13,7 @@
    :variables     {:outbound
                    {:departure            from
                     :arrival              to
-                    :dateTime             "2019-12-19"
+                    :dateTime             (format/unparse (format/formatter "yyyy-MM-dd") (time/now))
                     :showDepartedJourneys false}
                    :passengers [{:type passenger-type}]}
    :query         query})
@@ -28,6 +30,7 @@
     items))
 
 (defn get-routes [from to passenger-type]
+  (println "Querying with" from to passenger-type)
   (-> (create-query-string from to passenger-type)
       (post-query)
       (parse-response)))

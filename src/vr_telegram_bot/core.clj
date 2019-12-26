@@ -6,19 +6,35 @@
             [morse.api :as t]
             [morse.polling :as p]
             [vr_telegram_bot.service.vr-service :as vr-service]
-            [vr_telegram_bot.templates.route-list :as route-list])
+            [vr_telegram_bot.templates.route-list :as route-list]
+            [clojure.string :refer [split]])
   (:gen-class))
 
 (def token (env :telegram-token))
 (def environment (or (env :environment) "dev"))
+(def passenger-map
+  {:O "STUDENT"
+   :A "ADULT"
+   :L "CHILD"})
+
+(defn parse-message [text]
+  (let [args (->> (split text #" ")
+                  (drop 1))]
+    {:from      (nth args 0)
+     :to        (nth args 1)
+     :passenger (nth args 2)}))
 
 (h/defhandler handler
   (h/command-fn "etsi"
                 (fn [msg]
-                  (println)
-                  (let [items (vr-service/get-routes "HKI" "TPE" "ADULT")
-                        text  (route-list/template items)]
-                    (t/send-text token (get-in msg [:chat :id]) {:parse_mode "Markdown"} text)))))
+                  (let [params  (parse-message (:text msg))
+                        items   (vr-service/get-routes
+                                 (:from params)
+                                 (:to params)
+                                 (passenger-map (keyword (:passenger params))))
+                        text    (route-list/template items)
+                        chat-id (-> msg :chat :id)]
+                    (t/send-text token chat-id {:parse_mode "Markdown"} text)))))
 
 (defn -main
   [& args]

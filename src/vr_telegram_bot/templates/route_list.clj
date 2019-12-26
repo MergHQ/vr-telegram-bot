@@ -16,10 +16,12 @@
        "€"))
 
 (defn template [items]
-  (let [from (get-in (first items) [:departure :station])
-        to   (get-in (first items) [:arrival :station])]
-    (str from " -> " to "\n"
-         (reduce
-          (fn [value row]
-            (str value "\n" row))
-          (map map-to-string items)))))
+  (if (> (count items) 0)
+    (let [from (get-in (first items) [:departure :station])
+          to   (get-in (first items) [:arrival :station])]
+      (str from " -> " to "\n"
+           (reduce
+            (fn [value row]
+              (str value "\n" row))
+            (map map-to-string items))))
+    "Not found"))
