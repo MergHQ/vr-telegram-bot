@@ -1,0 +1,25 @@
+name: Build
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build uberjar
+      run: lein uberjar
+    - name: Login to ECR
+      id: ecr
+      uses: elgohr/ecr-login-action@master
+      with:
+        access_key: ${{ secrets.AWS_ACCESS_KEY }}
+        secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        region: eu-central-1
+    - name: Publish Docker
+      uses: elgohr/Publish-Docker-Github-Action@2.11
+      with:
+        registry: 616711703503.dkr.ecr.eu-central-1.amazonaws.com/vr-telegram-bot
+    
