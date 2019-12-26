@@ -21,5 +21,9 @@ jobs:
     - name: Publish Docker
       uses: elgohr/Publish-Docker-Github-Action@2.11
       with:
-        registry: 616711703503.dkr.ecr.eu-central-1.amazonaws.com/vr-telegram-bot
+        username: ${{ steps.ecr.outputs.username }}
+        password: ${{ steps.ecr.outputs.password }}
+        registry: ${{ steps.ecr.outputs.registry }}
+        name: vr-telegram-bot
+        buildargs: TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
     

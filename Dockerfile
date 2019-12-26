@@ -7,4 +7,4 @@ WORKDIR /
 
 COPY target/uberjar/vr-telegram-bot-0.1.0-SNAPSHOT-standalone.jar bot.jar
 
-RUN java -jar bot.jar
+CMD java -jar bot.jar
