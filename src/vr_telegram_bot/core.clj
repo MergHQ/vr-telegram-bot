@@ -14,6 +14,7 @@
 
 (def token (env :telegram-token))
 (def environment (or (env :environment) "dev"))
+(def port (Integer/parseInt (or (env :port) "3000")))
 (def passenger-map
   {:O "STUDENT"
    :A "ADULT"
@@ -51,5 +52,5 @@
   (if (= environment "prod")
     (do
       (t/set-webhook token (env :telegram-handler))
-      (jetty/run-jetty app {:port (or (env :port) 3000)}))
+      (jetty/run-jetty app {:port port}))
     (<!! (p/start token handler))))
