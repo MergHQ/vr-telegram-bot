@@ -31,7 +31,7 @@
 (h/defhandler handler
   (h/command-fn "etsi"
                 (fn [msg]
-                  (when (not-empty (re-matches #"/etsi [A-Ö]{3} [A-Ö]{3} [A-Ö]{1}" (:text msg)))
+                  (when (not-empty (re-matches #"/etsi [A-Ö]{2,3} [A-Ö]{2,3} [A-Ö]{1}" (:text msg)))
                     (let [params  (parse-message (:text msg))
                           items   (vr-service/get-routes
                                    (:from params)
@@ -44,7 +44,6 @@
 (c/defroutes app
   (c/POST "/handler"
           {updates :body}
-          (println updates)
           (if (list? updates)
             (map handler updates)
             (handler updates))))
