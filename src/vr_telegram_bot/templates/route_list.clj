@@ -10,7 +10,7 @@
        " -> "
        (f/unparse time-parser (f/parse basic-formatter (:time arrival)))
        "*"
-       (when (< (count legs) 2) " SOURA ")
+       (when (< (count legs) 2) " SUORA ")
        " - "
        (if (nil? (:price offer))
          "Loppuunmyyty"
