@@ -10,7 +10,9 @@
                  [morse               "0.2.4"]
                  [clj-http            "3.10.0"]
                  [cheshire            "5.9.0"]
-                 [clj-time            "0.15.2"]]
+                 [clj-time            "0.15.2"]
+                 [ring                "1.8.0"]
+                 [compojure           "1.6.1"]]
 
   :plugins [[lein-environ "1.1.0"]]
 

@@ -7,7 +7,9 @@
             [morse.polling :as p]
             [vr_telegram_bot.service.vr-service :as vr-service]
             [vr_telegram_bot.templates.route-list :as route-list]
-            [clojure.string :refer [split]])
+            [clojure.string :refer [split]]
+            [ring.adapter.jetty :as jetty]
+            [compojure.core :as c])
   (:gen-class))
 
 (def token (env :telegram-token))
@@ -27,14 +29,18 @@
 (h/defhandler handler
   (h/command-fn "etsi"
                 (fn [msg]
-                  (let [params  (parse-message (:text msg))
-                        items   (vr-service/get-routes
-                                 (:from params)
-                                 (:to params)
-                                 (passenger-map (keyword (:passenger params))))
-                        text    (route-list/template items)
-                        chat-id (-> msg :chat :id)]
-                    (t/send-text token chat-id {:parse_mode "Markdown"} text)))))
+                  (when (not-empty (re-matches #"/etsi [A-Ö]{3} [A-Ö]{3} [A-Ö]{1}" (:text msg)))
+                    (let [params  (parse-message (:text msg))
+                          items   (vr-service/get-routes
+                                   (:from params)
+                                   (:to params)
+                                   (passenger-map (keyword (:passenger params))))
+                          text    (route-list/template items)
+                          chat-id (-> msg :chat :id)]
+                      (t/send-text token chat-id {:parse_mode "Markdown"} text))))))
+
+(c/defroutes app
+  (c/POST "/handler" {{updates :result} :body} (map handler updates)))
 
 (defn -main
   [& args]
@@ -42,4 +48,8 @@
     (println "Please provde token in TELEGRAM_TOKEN environment variable!")
     (System/exit 1))
   (println "Starting the vr-telegram-bot")
-  (<!! (p/start token handler)))
+  (if (= environment "prod")
+    (do
+      (t/set-webhook token (env :telegram-handler))
+      (jetty/run-jetty app {:port (or (env :port) 3000)}))
+    (<!! (p/start token handler))))

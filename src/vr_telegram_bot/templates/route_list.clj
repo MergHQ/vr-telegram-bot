@@ -12,8 +12,9 @@
        "*"
        (when (< (count legs) 2) " SOURA ")
        " - "
-       (Math/round (double (/ (:price offer) 100)))
-       "€"))
+       (if (nil? (:price offer))
+         "Loppuunmyyty"
+         (str (Math/round (double (/ (:price offer) 100))) "€"))))
 
 (defn template [items]
   (if (> (count items) 0)
