@@ -9,6 +9,7 @@
             [vr_telegram_bot.templates.route-list :as route-list]
             [clojure.string :refer [split]]
             [ring.adapter.jetty :as jetty]
+            [ring.middleware.json :refer [wrap-json-body]]
             [compojure.core :as c])
   (:gen-class))
 
@@ -41,7 +42,12 @@
                       (t/send-text token chat-id {:parse_mode "Markdown"} text))))))
 
 (c/defroutes app
-  (c/POST "/handler" {{updates :result} :body} (map handler updates)))
+  (c/POST "/handler"
+          {updates :body}
+          (println updates)
+          (if (list? updates)
+            (map handler updates)
+            (handler updates))))
 
 (defn -main
   [& args]
@@ -52,5 +58,5 @@
   (if (= environment "prod")
     (do
       (t/set-webhook token (env :telegram-handler))
-      (jetty/run-jetty app {:port port}))
+      (jetty/run-jetty (wrap-json-body app {:keywords? true}) {:port port}))
     (<!! (p/start token handler))))

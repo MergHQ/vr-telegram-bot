@@ -12,7 +12,8 @@
                  [cheshire            "5.9.0"]
                  [clj-time            "0.15.2"]
                  [ring                "1.8.0"]
-                 [compojure           "1.6.1"]]
+                 [compojure           "1.6.1"]
+                 [ring/ring-json      "0.5.0"]]
 
   :plugins [[lein-environ "1.1.0"]]
 
